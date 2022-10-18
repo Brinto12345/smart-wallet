@@ -1,0 +1,97 @@
+#define ledPin 12 // assigned digital pin 12 for output led
+#define bluestat 11 // assigned digital pin 11 for identifiying the status of HC 05
+#define statusled 8 // assigned digital pin 8 for VISUAL STATUS 
+#define buzz 9 // BUZZER PIN
+int data = 0; // INITIALIZED INTEGER data AS ZERO
+int a = 0; // INITIALIZED INTEGER a AS ZERO
+int i;     // INITIALIZED INTEGER i
+int b = 0; // INITIALIZED INTEGER b AS ZERO
+void setup()
+{ Serial.begin(9600); //default baud rate for bt 38400
+  pinMode(ledPin, OUTPUT);// assigned ledpin as OUTPUT
+  pinMode(bluestat, INPUT);// assigned bluestat as INPUT
+  pinMode(statusled, OUTPUT);// assigned statusled as OUTPUT
+  pinMode(buzz, OUTPUT);// assigned buzzer as OUTPUT
+  //pinMode(button,INPUT);
+  digitalWrite(ledPin, LOW);// pulled ledpin low at time of start up.
+}
+void loop()
+{
+  //-----------------------------------------------------------------------------------------------
+
+  // this "if" condition compares wheather both "bluestat" and "a" are 0.if true it will run the body.
+  if ((digitalRead(bluestat) == HIGH) && (a == 0))
+  {
+    for (i = 0; i < 3; i++)
+    {
+      digitalWrite(buzz, HIGH);
+      delay(300);
+      digitalWrite(buzz, LOW);
+      delay(100);
+    }
+    a = 1;// injecting new value to a
+  }
+  // this "if" condition compares wheather both "bluestat" is 0 and "a" is 1.if true, it will execute the body.
+  if ((digitalRead(bluestat) == LOW) && (a == 1))
+  {
+    digitalWrite(buzz, LOW);
+    a = 0; //injecting new value to a
+  }
+
+  //-----------------------------------------------------------------------------------------------------------
+  // this "if" condition compares wheather both "bluestat" is 0 and "b" is 0.if true, it will execute the body.
+  if ((digitalRead(bluestat) == LOW) && (b == 0))
+  {
+    for (i = 0; i < 3; i++)
+    {
+      digitalWrite(buzz, HIGH);
+      delay(100);
+      digitalWrite(buzz, LOW);
+      delay(100);
+    }
+    b = 1;//injecting new value to b
+  }
+  
+  // this "if" condition compares wheather both "bluestat" is 1 and "b" is 1.if true, it will execute the body.
+  
+  if ((digitalRead(bluestat) == HIGH) && (b == 1))
+  {
+    digitalWrite(buzz, LOW);
+    b = 0; //injecting new value to b
+  }
+  
+  // if bluestat is 1,led will start blinking at rate of 300mili seconds
+
+  if (digitalRead(bluestat) == HIGH)
+  {
+    digitalWrite(statusled, HIGH);
+    delay(300);
+    digitalWrite(statusled, LOW);
+    delay(300);
+  }
+
+
+  else// if none of the if condition gets true,default or else command will get executed.
+  {
+    digitalWrite(statusled, LOW);
+
+  }
+  //----------------------------------------------------------------------------------------------------------------------------
+
+  // here we are calling out serial command.
+
+  if (Serial.available() > 0)
+    data = Serial.read();
+  // if the serial read value is 0 then led will turn off
+  if (data == '0')
+  {
+    digitalWrite(ledPin, LOW);
+    Serial.println("OOPS! YOU LOST YOUR WALLET");
+  }
+  //if the serial read value is 1 then led will turn on
+  else if (data == '1')
+  {
+    digitalWrite(ledPin, HIGH);
+    Serial.println("WALLET IS SAFE AND SECURE");
+
+  }
